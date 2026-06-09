@@ -12,10 +12,11 @@ import type {
 } from '@actual-app/core/types/models';
 import { isValid as isDateValid, parseISO } from 'date-fns';
 
-export type SerializedTransaction = Omit<TransactionEntity, 'date'> & {
+export type SerializedTransaction = Omit<TransactionEntity, 'date' | 'tax'> & {
   date: string;
   debit: CurrencyAmount;
   credit: CurrencyAmount;
+  tax: CurrencyAmount;
 };
 
 export type TransactionEditFunction = (
@@ -32,7 +33,7 @@ export function serializeTransaction(
   transaction: TransactionEntity,
   showZeroInDeposit?: boolean,
 ): SerializedTransaction {
-  const { amount, date: originalDate } = transaction;
+  const { amount, tax, date: originalDate } = transaction;
 
   let debit = amount < 0 ? -amount : null;
   let credit = amount > 0 ? amount : null;
@@ -63,6 +64,7 @@ export function serializeTransaction(
     date,
     debit: debit != null ? integerToCurrencyWithDecimal(debit) : '',
     credit: credit != null ? integerToCurrencyWithDecimal(credit) : '',
+    tax: tax != null ? integerToCurrencyWithDecimal(tax) : '',
   };
 }
 
@@ -70,7 +72,13 @@ export function deserializeTransaction(
   transaction: SerializedTransaction,
   originalTransaction: TransactionEntity,
 ) {
-  const { debit, credit, date: originalDate, ...realTransaction } = transaction;
+  const {
+    debit,
+    credit,
+    date: originalDate,
+    tax: taxStr,
+    ...realTransaction
+  } = transaction;
 
   let amount: number | null;
   if (debit !== '') {
@@ -87,7 +95,13 @@ export function deserializeTransaction(
     date = originalTransaction.date || currentDay();
   }
 
-  return { ...realTransaction, date, amount };
+  let tax: number | null = null;
+  if (taxStr !== '' && taxStr != null) {
+    const parsed = evalArithmetic(taxStr, null);
+    tax = parsed != null ? amountToInteger(parsed) : null;
+  }
+
+  return { ...realTransaction, date, amount, tax };
 }
 
 export function isLastChild(

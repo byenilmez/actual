@@ -21,6 +21,7 @@ export type TransactionEntity = {
   starting_balance_flag?: boolean;
   transfer_id?: TransactionEntity['id'];
   sort_order?: number;
+  tax?: number | null;
   cleared?: boolean;
   reconciled?: boolean;
   tombstone?: boolean;

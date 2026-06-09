@@ -49,6 +49,7 @@ export const schema = {
     starting_balance_flag: f('boolean'),
     transfer_id: f('id'),
     sort_order: f('float', { default: () => Date.now() }),
+    tax: f('integer'),
     cleared: f('boolean', { default: true }),
     reconciled: f('boolean', { default: false }),
     tombstone: f('boolean'),

@@ -49,6 +49,7 @@ export async function exportToCSV(
       notes,
       category,
       amount,
+      tax,
       cleared,
       reconciled,
     }) => ({
@@ -58,6 +59,7 @@ export async function exportToCSV(
       Notes: notes,
       Category: categoryNamesById[category],
       Amount: amount == null ? 0 : integerToAmount(amount),
+      Tax: tax == null ? '' : integerToAmount(tax),
       Cleared: cleared,
       Reconciled: reconciled,
     }),
@@ -82,6 +84,7 @@ export async function exportQueryToCSV(query) {
         { CategoryGroup: 'category.group.name' },
         { Category: 'category.name' },
         { Amount: 'amount' },
+        { Tax: 'tax' },
         { Cleared: 'cleared' },
         { Reconciled: 'reconciled' },
       ])
@@ -128,6 +131,7 @@ export async function exportQueryToCSV(query) {
         : trans.Amount == null
           ? 0
           : integerToAmount(trans.Amount),
+      Tax: trans.Tax == null ? '' : integerToAmount(trans.Tax),
       Split_Amount: trans.IsParent ? integerToAmount(trans.Amount) : 0,
       Cleared:
         trans.Reconciled === true

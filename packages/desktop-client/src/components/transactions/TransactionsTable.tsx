@@ -312,6 +312,17 @@ const TransactionHeader = memo(
             onSort('deposit', selectAscDesc(field, ascDesc, 'deposit', 'desc'))
           }
         />
+        <HeaderCell
+          value={t('Tax')}
+          width={100}
+          alignItems="flex-end"
+          marginRight={-5}
+          id="tax"
+          icon={field === 'tax' ? ascDesc : 'clickable'}
+          onClick={() =>
+            onSort('tax', selectAscDesc(field, ascDesc, 'tax', 'asc'))
+          }
+        />
         {showBalance && (
           <HeaderCell
             value={t('Balance')}
@@ -1113,7 +1124,7 @@ const Transaction = memo(function Transaction({
       newTransaction['debit'] = '';
     } else if (name === 'debit') {
       newTransaction['credit'] = '';
-    } else {
+    } else if (name !== 'tax') {
       newTransaction['debit'] = '';
       newTransaction['credit'] = '';
     }
@@ -1151,6 +1162,7 @@ const Transaction = memo(function Transaction({
     amount,
     debit,
     credit,
+    tax,
     payee: payeeId,
     imported_payee: importedPayee,
     notes,
@@ -1846,6 +1858,35 @@ const Transaction = memo(function Transaction({
           inputProps={{
             value: credit,
             onUpdate: onUpdate.bind(null, 'credit'),
+            'data-1p-ignore': true,
+          }}
+          privacyFilter={{
+            activationFilters: [!isTemporaryId(transaction.id)],
+          }}
+        />
+
+        <InputCell
+          /* Tax field for all transactions */
+          type="input"
+          width={100}
+          name="tax"
+          exposed={focusedField === 'tax'}
+          focused={focusedField === 'tax'}
+          value={tax}
+          formatter={value =>
+            value ? amountToCurrency(currencyToAmount(value) || 0) : ''
+          }
+          valueStyle={valueStyle}
+          textAlign="right"
+          title={tax}
+          onExpose={name => !isPreview && onEdit(id, name)}
+          style={{
+            ...styles.tnum,
+            ...amountStyle,
+          }}
+          inputProps={{
+            value: tax,
+            onUpdate: onUpdate.bind(null, 'tax'),
             'data-1p-ignore': true,
           }}
           privacyFilter={{
